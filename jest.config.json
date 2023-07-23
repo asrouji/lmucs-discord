@@ -1,0 +1,28 @@
+{
+  "testEnvironment": "node",
+  "roots": [
+    "<rootDir>/src",
+    "<rootDir>/test"
+  ],
+  "testMatch": [
+    "**/__tests__/**/*.+(ts|js)",
+    "**/?(*.)+(spec|test).+(ts|js)"
+  ],
+  "transform": {
+    "^.+\\.(js|ts)$": "babel-jest"
+  },
+  "moduleDirectories": [
+    "node_modules",
+    "src"
+  ],
+  "collectCoverage": true,
+  "collectCoverageFrom": [
+    "src/**/*.{js,ts}"
+  ],
+  "coveragePathIgnorePatterns": [
+    "/node_modules/",
+    "/test/",
+    "/src/scripts/",
+    "/src/types/"
+  ]
+}
