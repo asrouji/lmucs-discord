@@ -6,8 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "ts-node src/scripts/start.ts",
-    "test": "jest",
-    "test:watch": "jest --watch",
+    "test": "npx jest",
+    "test:watch": "npx jest --watch",
     "lint": "eslint src --ext .ts",
     "typecheck": "tsc --noEmit",
     "build": "yarn typecheck && yarn lint && yarn test",
