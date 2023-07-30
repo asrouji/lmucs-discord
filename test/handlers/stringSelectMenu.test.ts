@@ -2,6 +2,10 @@ import { StringSelectMenuInteraction } from 'discord.js'
 import { mock } from 'jest-mock-extended'
 import stringSelectMenuHandler from '../../src/handlers/stringSelectMenu'
 
+beforeAll(() => {
+  console.error = jest.fn()
+})
+
 describe('onboarding role selection', () => {
   test('shows the onboarding modal on selection', async () => {
     const interaction = mock<StringSelectMenuInteraction>({
