@@ -1,96 +1,74 @@
-import { Client, Collection, CommandInteraction, Interaction, SlashCommandBuilder } from 'discord.js'
-import interactionEvent from '../../src/events/interactionCreate'
-import { MockProxy, mock } from 'jest-mock-extended'
-import BotClient from '../../src/util/botClient'
-import Command from '../../src/types/command'
-
-let client: MockProxy<BotClient>
-let interaction: MockProxy<CommandInteraction>
+import { ChatInputCommandInteraction, Interaction, StringSelectMenuInteraction } from 'discord.js'
+import { mock } from 'jest-mock-extended'
+import interactionCreateEvent from '../../src/events/interactionCreate'
+import chatInputCommandHandler from '../../src/handlers/chatInputCommand'
+import stringSelectMenuHandler from '../../src/handlers/stringSelectMenu'
+import modalSubmitHandler from '../../src/handlers/modalSubmit'
 
 beforeAll(() => {
-  // Mock console.log and console.error to prevent them from logging to the console
-  console.log = jest.fn()
   console.error = jest.fn()
 })
 
-beforeEach(() => {
-  // Create a mock client and interaction for each test
-  client = mock<BotClient>()
-  interaction = mock<CommandInteraction>({
+test('invokes the correct interaction handler', async () => {
+  const chatInputCommandInteraction = mock<ChatInputCommandInteraction>({
     isCommand: jest.fn().mockReturnValue(true),
     isChatInputCommand: jest.fn().mockReturnValue(true),
-    client: client as Client<true>,
+    isStringSelectMenu: jest.fn().mockReturnValue(false),
+    isModalSubmit: jest.fn().mockReturnValue(false),
     valueOf: jest.fn(),
-  }) as unknown as MockProxy<CommandInteraction>
+  })
+
+  const stringSelectMenuInteraction = mock<StringSelectMenuInteraction>({
+    isCommand: jest.fn().mockReturnValue(false),
+    isChatInputCommand: jest.fn().mockReturnValue(false),
+    isStringSelectMenu: jest.fn().mockReturnValue(true),
+    isModalSubmit: jest.fn().mockReturnValue(false),
+    valueOf: jest.fn(),
+  })
+
+  const modalSubmitInteraction = mock<Interaction>({
+    isCommand: jest.fn().mockReturnValue(false),
+    isChatInputCommand: jest.fn().mockReturnValue(false),
+    isStringSelectMenu: jest.fn().mockReturnValue(false),
+    isModalSubmit: jest.fn().mockReturnValue(true),
+    valueOf: jest.fn(),
+  })
+
+  // Spy on the handlers to see if they are called
+  const chatInputCommandHandlerMock = jest.spyOn(chatInputCommandHandler, 'handle').mockImplementation()
+  const stringSelectMenuHandlerMock = jest.spyOn(stringSelectMenuHandler, 'handle').mockImplementation()
+  const modalSubmitHandlerMock = jest.spyOn(modalSubmitHandler, 'handle').mockImplementation()
+
+  await interactionCreateEvent.execute(chatInputCommandInteraction)
+  expect(chatInputCommandHandlerMock).toHaveBeenCalledTimes(1)
+  expect(stringSelectMenuHandlerMock).not.toHaveBeenCalled()
+  expect(modalSubmitHandlerMock).not.toHaveBeenCalled()
+
+  jest.clearAllMocks()
+
+  await interactionCreateEvent.execute(stringSelectMenuInteraction)
+  expect(chatInputCommandHandlerMock).not.toHaveBeenCalled()
+  expect(stringSelectMenuHandlerMock).toHaveBeenCalledTimes(1)
+  expect(modalSubmitHandlerMock).not.toHaveBeenCalled()
+
+  jest.clearAllMocks()
+
+  await interactionCreateEvent.execute(modalSubmitInteraction)
+  expect(chatInputCommandHandlerMock).not.toHaveBeenCalled()
+  expect(stringSelectMenuHandlerMock).not.toHaveBeenCalled()
+  expect(modalSubmitHandlerMock).toHaveBeenCalledTimes(1)
 })
 
-test('finds and executes the correct command', async () => {
-  // Create two commands, one with the correct name and one with an incorrect name
-  const correctCommand: Command = {
-    data: new SlashCommandBuilder().setName('correct').setDescription('Correct command'),
-    execute: jest.fn(),
-  }
-  const incorrectCommand: Command = {
-    data: new SlashCommandBuilder().setName('incorrect').setDescription('Incorrect command'),
-    execute: jest.fn(),
-  }
+test('logs an error if no handler is found', async () => {
+  const interaction = mock<Interaction>({
+    isCommand: jest.fn().mockReturnValue(false),
+    isChatInputCommand: jest.fn().mockReturnValue(false),
+    isStringSelectMenu: jest.fn().mockReturnValue(false),
+    isModalSubmit: jest.fn().mockReturnValue(false),
+    valueOf: jest.fn(),
+  })
 
-  // Add both commands to the client
-  client.commands = new Collection<string, Command>()
-  client.commands.set(correctCommand.data.name, correctCommand)
-  client.commands.set(incorrectCommand.data.name, incorrectCommand)
+  await interactionCreateEvent.execute(interaction)
 
-  interaction.commandName = correctCommand.data.name
-  await interactionEvent.execute(interaction as Interaction)
-
-  // Ensure that the correct command was executed
-  expect(correctCommand.execute).toHaveBeenCalledWith(interaction)
-  // Ensure that the incorrect command was not executed
-  expect(incorrectCommand.execute).not.toHaveBeenCalled()
-})
-
-test('does not execute if the interaction is not a command', async () => {
-  client.commands.get = jest.fn()
-  interaction.isCommand.mockReturnValue(false)
-  interaction.isChatInputCommand.mockReturnValue(false)
-
-  await interactionEvent.execute(interaction as Interaction)
-
-  // Ensure we did not try to find a command, since this is not a command interaction
-  expect(client.commands.get).not.toHaveBeenCalled()
-})
-
-test('does not execute if the command does not exist', async () => {
-  client.commands = new Collection<string, Command>()
-  interaction.commandName = 'test123'
-
-  console.error = jest.fn()
-
-  await interactionEvent.execute(interaction as Interaction)
-
-  // Ensure that the error was logged
   expect(console.error).toHaveBeenCalled()
-  // Ensure we still replied to the interaction
-  expect(interaction.reply).toHaveBeenCalled()
-})
-
-test('catches errors in the command execution', async () => {
-  const command: Command = {
-    data: new SlashCommandBuilder().setName('command').setDescription('Command'),
-    execute: jest.fn().mockRejectedValue(new Error('Test error')),
-  }
-
-  client.commands = new Collection<string, Command>()
-  client.commands.set(command.data.name, command)
-
-  interaction.commandName = command.data.name
-
-  console.error = jest.fn()
-
-  await interactionEvent.execute(interaction as Interaction)
-
-  // Ensure that the error was logged
-  expect(console.error).toHaveBeenCalled()
-  // Ensure that we still replied to the interaction
-  expect(interaction.reply).toHaveBeenCalled()
 })
