@@ -61,7 +61,7 @@ describe('onboarding modal submission', () => {
 test('defers the interaction if the customId does not match', async () => {
   const interaction = mock<ModalSubmitInteraction>({
     customId: 'not-onboarding-modal',
-    deferUpdate: jest.fn(),
+    deferUpdate: jest.fn().mockReturnValue(Promise.resolve()),
     valueOf: jest.fn(),
   })
   await modalSubmitInteractionHandler.handle(interaction)

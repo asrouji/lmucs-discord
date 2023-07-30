@@ -25,7 +25,7 @@ const handler: InteractionHandler<StringSelectMenuInteraction> = {
       await interaction.showModal(modal)
     } else {
       console.error(`Unknown StringSelectMenuInteraction ${interaction.customId}`)
-      interaction.deferUpdate()
+      interaction.deferUpdate().catch(console.error)
     }
   },
 }

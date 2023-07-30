@@ -19,7 +19,7 @@ const handler: InteractionHandler<ModalSubmitInteraction> = {
       }
     } else {
       console.error(`Unknown ModalSubmitInteraction ${interaction.customId}`)
-      interaction.deferUpdate()
+      interaction.deferUpdate().catch(console.error)
     }
   },
 }

@@ -19,7 +19,7 @@ describe('onboarding role selection', () => {
 test('defers the interaction if the customId does not match', async () => {
   const interaction = mock<StringSelectMenuInteraction>({
     customId: 'invalid-custom-id',
-    deferUpdate: jest.fn(),
+    deferUpdate: jest.fn().mockReturnValue(Promise.resolve()),
     valueOf: jest.fn(),
   })
   await stringSelectMenuHandler.handle(interaction)
