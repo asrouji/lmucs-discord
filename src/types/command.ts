@@ -5,7 +5,7 @@ import { CommandInteraction, SlashCommandBuilder } from 'discord.js'
  */
 export default interface Command {
   /** The command data for Discord to display (use a SlashCommandBuilder!) */
-  data: SlashCommandBuilder
+  data: SlashCommandBuilder | Omit<SlashCommandBuilder, 'addSubcommand' | 'addSubcommandGroup'>
   /** The function to execute when the command is called */
   execute: (interaction: CommandInteraction) => Promise<unknown>
 }
