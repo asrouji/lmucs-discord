@@ -36,9 +36,9 @@ const selectMenu = new StringSelectMenuBuilder()
   .setCustomId('onboarding-role-select')
   .setPlaceholder('I am a...')
   .addOptions([
-    new StringSelectMenuOptionBuilder().setLabel('Current Student').setValue('student').setEmoji('📚'),
+    new StringSelectMenuOptionBuilder().setLabel('Student').setValue('student').setEmoji('📚'),
     new StringSelectMenuOptionBuilder().setLabel('Alum').setValue('alum').setEmoji('🎓'),
-    new StringSelectMenuOptionBuilder().setLabel('Faculty Member').setValue('faculty').setEmoji('🧑‍🏫'),
+    new StringSelectMenuOptionBuilder().setLabel('Faculty / Staff').setValue('faculty').setEmoji('🧑‍🏫'),
     new StringSelectMenuOptionBuilder().setLabel('Guest').setValue('guest').setEmoji('👤'),
   ])
 

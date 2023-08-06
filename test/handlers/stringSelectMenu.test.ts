@@ -1,4 +1,4 @@
-import { StringSelectMenuInteraction } from 'discord.js'
+import { StringSelectMenuInteraction, TextChannel } from 'discord.js'
 import { mock } from 'jest-mock-extended'
 import stringSelectMenuHandler from '../../src/handlers/stringSelectMenu'
 
@@ -10,13 +10,38 @@ describe('onboarding role selection', () => {
   test('shows the onboarding modal on selection', async () => {
     const interaction = mock<StringSelectMenuInteraction>({
       customId: 'onboarding-role-select',
+      values: ['student'],
       valueOf: jest.fn(),
       showModal: jest.fn(),
     })
 
     await stringSelectMenuHandler.handle(interaction)
-
     expect(interaction.showModal).toHaveBeenCalled()
+  })
+
+  test('sends a verification request for faculty/staff', async () => {
+    const modChannel = mock<TextChannel>({
+      isTextBased: jest.fn().mockReturnValue(true),
+      send: jest.fn(),
+      valueOf: jest.fn(),
+      toString: jest.fn(),
+    })
+    const interaction = mock<StringSelectMenuInteraction>({
+      customId: 'onboarding-role-select',
+      values: ['faculty'],
+      valueOf: jest.fn(),
+      reply: jest.fn(),
+      guild: {
+        channels: {
+          fetch: jest.fn().mockReturnValue(modChannel),
+          valueOf: jest.fn(),
+        },
+        valueOf: jest.fn(),
+      },
+    })
+    await stringSelectMenuHandler.handle(interaction)
+    expect(interaction.reply).toHaveBeenCalled()
+    expect(modChannel.send).toHaveBeenCalled()
   })
 })
 
