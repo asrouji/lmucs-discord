@@ -45,14 +45,24 @@ jobs:
         echo "Coverage Color - ${{ steps.coverageComment.outputs.color }}"
         echo "Summary HTML - ${{ steps.coverageComment.outputs.summaryHtml }}"
 
-    - name: Create the badge
+    - name: Update the build status badge
+      if: github.ref == 'refs/heads/master'
+      uses: schneegans/dynamic-badges-action@v1.6.0
+      with:
+        auth: ${{ secrets.JEST_COVERAGE_COMMENT }}
+        gistID: c3e578e189ea5b3c189d7c44c7ff3317
+        filename: build-status-comment__main.json
+        label: build
+        message: ${{ job.status }}
+        color: ${{ job.status == 'success' && 'green' || 'red' }}
+
+    - name: Update the coverage badge
       if: github.ref == 'refs/heads/master'
       uses: schneegans/dynamic-badges-action@v1.6.0
       with:
         auth: ${{ secrets.JEST_COVERAGE_COMMENT }}
         gistID: ca3d0d92e59bedada3800654ccedcb98
         filename: jest-coverage-comment__main.json
-        label: Coverage
+        label: coverage
         message: ${{ steps.coverageComment.outputs.coverage }}%
         color: ${{ steps.coverageComment.outputs.color }}
-        namedLogo: typescript
