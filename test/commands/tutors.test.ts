@@ -76,20 +76,20 @@ test('displays tutoring sessions in the embed', async () => {
     {
       name: 'Tutor A',
       classNumber: '1010',
-      start: DateTime.local(2023, 1, 10, 10).setZone('America/Los_Angeles', { keepLocalTime: true }),
-      end: DateTime.local(2023, 1, 10, 11).setZone('America/Los_Angeles', { keepLocalTime: true }),
+      start: DateTime.local(2023, 1, 10, 10, { zone: 'America/Los_Angeles' }),
+      end: DateTime.local(2023, 1, 10, 11, { zone: 'America/Los_Angeles' }),
     },
     {
       name: 'Tutor B',
       classNumber: '1010',
-      start: DateTime.local(2023, 1, 10, 12).setZone('America/Los_Angeles', { keepLocalTime: true }),
-      end: DateTime.local(2023, 1, 10, 14).setZone('America/Los_Angeles', { keepLocalTime: true }),
+      start: DateTime.local(2023, 1, 10, 12, { zone: 'America/Los_Angeles' }),
+      end: DateTime.local(2023, 1, 10, 14, { zone: 'America/Los_Angeles' }),
     },
     {
       name: 'Tutor C',
       classNumber: '1010',
-      start: DateTime.local(2023, 1, 10, 13).setZone('America/Los_Angeles', { keepLocalTime: true }),
-      end: DateTime.local(2023, 1, 10, 16).setZone('America/Los_Angeles', { keepLocalTime: true }),
+      start: DateTime.local(2023, 1, 10, 13, { zone: 'America/Los_Angeles' }),
+      end: DateTime.local(2023, 1, 10, 16, { zone: 'America/Los_Angeles' }),
     },
   ]
 
@@ -157,31 +157,15 @@ test('shows current and upcoming sessions when no date input is given', async ()
       // current session
       name: 'Tutor A',
       classNumber: '1010',
-      start: DateTime.local()
-        .setZone('America/Los_Angeles', {
-          keepLocalTime: true,
-        })
-        .minus({ minutes: 30 }),
-      end: DateTime.local()
-        .setZone('America/Los_Angeles', {
-          keepLocalTime: true,
-        })
-        .plus({ minutes: 30 }),
+      start: DateTime.local({ zone: 'America/Los_Angeles' }).minus({ minutes: 30 }),
+      end: DateTime.local({ zone: 'America/Los_Angeles' }).plus({ minutes: 30 }),
     },
     {
       // upcoming session
       name: 'Tutor B',
       classNumber: '1010',
-      start: DateTime.local()
-        .setZone('America/Los_Angeles', {
-          keepLocalTime: true,
-        })
-        .plus({ minutes: 30 }),
-      end: DateTime.local()
-        .setZone('America/Los_Angeles', {
-          keepLocalTime: true,
-        })
-        .plus({ minutes: 90 }),
+      start: DateTime.local({ zone: 'America/Los_Angeles' }).plus({ minutes: 30 }),
+      end: DateTime.local({ zone: 'America/Los_Angeles' }).plus({ minutes: 90 }),
     },
   ]
 
@@ -232,16 +216,8 @@ test('shows upcoming sessions for the week if no sessions today', async () => {
       // upcoming session
       name: 'Tutor A',
       classNumber: '1010',
-      start: DateTime.local()
-        .setZone('America/Los_Angeles', {
-          keepLocalTime: true,
-        })
-        .plus({ days: 1 }),
-      end: DateTime.local()
-        .setZone('America/Los_Angeles', {
-          keepLocalTime: true,
-        })
-        .plus({ days: 1, hours: 1 }),
+      start: DateTime.local({ zone: 'America/Los_Angeles' }).plus({ days: 1 }),
+      end: DateTime.local({ zone: 'America/Los_Angeles' }).plus({ days: 1, minutes: 30 }),
     },
   ]
 
@@ -282,16 +258,8 @@ test('truncates the output if there are too many sessions', async () => {
   const session: TutoringSession = {
     name: 'Tutor A',
     classNumber: '1010',
-    start: DateTime.local()
-      .setZone('America/Los_Angeles', {
-        keepLocalTime: true,
-      })
-      .minus({ minutes: 30 }),
-    end: DateTime.local()
-      .setZone('America/Los_Angeles', {
-        keepLocalTime: true,
-      })
-      .plus({ minutes: 30 }),
+    start: DateTime.local({ zone: 'America/Los_Angeles' }).minus({ minutes: 30 }),
+    end: DateTime.local({ zone: 'America/Los_Angeles' }).plus({ minutes: 30 }),
   }
 
   const mockSessions: TutoringSession[] = []

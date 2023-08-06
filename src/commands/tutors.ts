@@ -62,7 +62,7 @@ const command: Command = {
         .map(
           event =>
             `• ${event.name} [${event.classNumber}] (${event.start
-              .setZone('America/Los_Angeles')
+              .setZone('America/Los_Angeles', { keepLocalTime: true })
               .toLocaleString(DateTime.TIME_SIMPLE)} - ${event.end.toLocaleString(DateTime.TIME_SIMPLE)})`
         )
         .concat(events.length > maxEvents ? `• (${events.length - maxEvents} more...)` : '')
