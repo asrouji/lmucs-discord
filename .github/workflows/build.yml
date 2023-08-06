@@ -31,3 +31,6 @@ jobs:
 
     - name: Run Jest Unit Tests
       run: yarn test
+
+    - name: Jest Coverage Comment
+      uses: MishaKav/jest-coverage-comment@main
