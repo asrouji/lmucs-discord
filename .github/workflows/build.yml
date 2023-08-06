@@ -55,4 +55,4 @@ jobs:
         label: Coverage
         message: ${{ steps.coverageComment.outputs.coverage }}%
         color: ${{ steps.coverageComment.outputs.color }}
-        namedLogo: javascript
+        namedLogo: typescript
