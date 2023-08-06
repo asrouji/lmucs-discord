@@ -61,9 +61,9 @@ const command: Command = {
         .slice(0, maxEvents)
         .map(
           event =>
-            `• ${event.name} [${event.classNumber}] (${event.start.toLocaleString(
-              DateTime.TIME_SIMPLE
-            )} - ${event.end.toLocaleString(DateTime.TIME_SIMPLE)})`
+            `• ${event.name} [${event.classNumber}] (${event.start
+              .setZone('America/Los_Angeles')
+              .toLocaleString(DateTime.TIME_SIMPLE)} - ${event.end.toLocaleString(DateTime.TIME_SIMPLE)})`
         )
         .concat(events.length > maxEvents ? `• (${events.length - maxEvents} more...)` : '')
         .join('\n')
