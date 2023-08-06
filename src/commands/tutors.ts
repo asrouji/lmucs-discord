@@ -37,7 +37,7 @@ const command: Command = {
 
     const currentTime = dateInput
       ? DateTime.fromFormat(dateInput, 'MM/dd/yyyy', { zone: 'America/Los_Angeles' })
-      : DateTime.now().setZone('America/Los_Angeles')
+      : DateTime.local({ zone: 'America/Los_Angeles' })
 
     if (!currentTime.isValid) {
       await interaction.reply({ content: 'Invalid date format. Please use MM/DD/YYYY.', ephemeral: true })
