@@ -64,5 +64,5 @@ jobs:
         gistID: ca3d0d92e59bedada3800654ccedcb98
         filename: jest-coverage-comment__main.json
         label: coverage
-        message: ${{ steps.coverageComment.outputs.coverage }}
+        message: ${{ steps.coverageComment.outputs.coverage }}%
         color: ${{ steps.coverageComment.outputs.color }}
