@@ -54,7 +54,7 @@ jobs:
         filename: build-status-comment__main.json
         label: build
         message: ${{ job.status }}
-        color: ${{ job.status == 'success' && 'brightgreen' || 'brightred' }}
+        color: ${{ job.status == 'success' && 'green' || 'red' }}
 
     - name: Update the coverage badge
       if: github.ref == 'refs/heads/master'
