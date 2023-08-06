@@ -50,9 +50,9 @@ jobs:
       uses: schneegans/dynamic-badges-action@v1.6.0
       with:
         auth: ${{ secrets.JEST_COVERAGE_COMMENT }}
-        gistID: ca3d0d92e59bedada3800654ccedcb98
+        gistID: 5e90d640f8c212ab7bbac38f72323f80
         filename: jest-coverage-comment__main.json
         label: Coverage
         message: ${{ steps.coverageComment.outputs.coverage }}%
         color: ${{ steps.coverageComment.outputs.color }}
-        namedLogo: typescript
+        namedLogo: javascript
