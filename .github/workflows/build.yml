@@ -49,8 +49,8 @@ jobs:
       if: github.ref == 'refs/heads/main'
       uses: schneegans/dynamic-badges-action@v1.6.0
       with:
-        auth: ${{ secrets.GITHUB_TOKEN }}
-        gistID: 5e90d640f8c212ab7bbac38f72323f80
+        auth: ${{ secrets.JEST_COVERAGE_COMMENT }}
+        gistID: ca3d0d92e59bedada3800654ccedcb98
         filename: jest-coverage-comment__main.json
         label: Coverage
         message: ${{ steps.coverageComment.outputs.coverage }}%
