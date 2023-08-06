@@ -54,7 +54,7 @@ jobs:
         filename: build-status-comment__main.json
         label: build
         message: ${{ job.status }}
-        color: ${{ job.status == 'success' && 'lightgreen' || 'lightred' }}
+        color: ${{ job.status == 'success' && 'brightgreen' || 'brightred' }}
 
     - name: Update the coverage badge
       if: github.ref == 'refs/heads/master'
@@ -64,5 +64,5 @@ jobs:
         gistID: ca3d0d92e59bedada3800654ccedcb98
         filename: jest-coverage-comment__main.json
         label: coverage
-        message: ${{ steps.coverageComment.outputs.coverage }}%
+        message: ${{ steps.coverageComment.outputs.coverage }}
         color: ${{ steps.coverageComment.outputs.color }}
