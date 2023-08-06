@@ -1,6 +1,8 @@
 import dotenv from 'dotenv'
 dotenv.config()
 
+export const DISCORD_EMBED_FIELD_VALUE_LIMIT = 1024
+
 const CLASS_1010_URL = process.env.CLASS_1010_URL || ''
 
 const CLASS_2120_URL = process.env.CLASS_2120_URL || ''

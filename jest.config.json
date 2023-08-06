@@ -23,6 +23,7 @@
     "/node_modules/",
     "/test/",
     "/src/scripts/",
-    "/src/types/"
+    "/src/types/",
+    "/src/util/constants"
   ]
 }

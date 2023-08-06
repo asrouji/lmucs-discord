@@ -3,11 +3,23 @@
 import ICalExpander from 'ical-expander'
 import { DateTime } from 'luxon'
 import { CALENDAR_URLS, CLASS_DATA } from './constants'
+import { TutoringSession } from '../types/tutoringSession'
+import fs from 'fs'
+import path from 'path'
 
 const fetchCalendar = async (url: string) => {
-  const response = await fetch(url)
-  const ics = await response.text()
-  return new ICalExpander({ ics, maxIterations: 100 })
+  // If the URL is a local path, read the file directly
+  /* istanbul ignore else */
+  if (path.isAbsolute(url)) {
+    return new ICalExpander({
+      ics: fs.readFileSync(url, 'utf-8'),
+    })
+  } else {
+    // Otherwise, fetch the URL
+    const response = await fetch(url)
+    const ics = await response.text()
+    return new ICalExpander({ ics, maxIterations: 100 })
+  }
 }
 
 const getCalendarEvents = async (url: string, from: DateTime, to: DateTime) => {
@@ -15,7 +27,7 @@ const getCalendarEvents = async (url: string, from: DateTime, to: DateTime) => {
   const events = icalExpander.between(from.toUTC().toJSDate(), to.toUTC().toJSDate())
   const mappedEvents = events.events.map(
     (e: { startDate: { toJSDate: () => Date }; endDate: { toJSDate: () => Date }; summary: string }) => ({
-      star: DateTime.fromJSDate(e.startDate.toJSDate()),
+      start: DateTime.fromJSDate(e.startDate.toJSDate()),
       end: DateTime.fromJSDate(e.endDate.toJSDate()),
       summary: e.summary,
     })
@@ -38,7 +50,7 @@ export const getTutoringSessions = async (options: {
   classNumber?: keyof typeof CLASS_DATA
   start: DateTime
   end: DateTime
-}) => {
+}): Promise<TutoringSession[]> => {
   let events: { start: DateTime; end: DateTime; summary: string }[]
   if (options?.classNumber) {
     events = await getCalendarEvents(CLASS_DATA[options.classNumber].url, options.start, options.end)
