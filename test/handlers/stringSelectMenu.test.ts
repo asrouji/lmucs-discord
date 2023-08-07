@@ -39,9 +39,12 @@ describe('onboarding role selection', () => {
         valueOf: jest.fn(),
       },
     })
+    const oldEnv = process.env.MOD_CHANNEL_ID
+    process.env.MOD_CHANNEL_ID = '1234567890'
     await stringSelectMenuHandler.handle(interaction)
     expect(interaction.reply).toHaveBeenCalled()
     expect(modChannel.send).toHaveBeenCalled()
+    process.env.MOD_CHANNEL_ID = oldEnv
   })
 })
 
