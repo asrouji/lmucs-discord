@@ -6,12 +6,7 @@ import {
 } from 'discord.js'
 import Command from '../types/command'
 import dotenv from 'dotenv'
-import path from 'path'
-import { fileURLToPath } from 'url'
 import { Rcon } from 'rcon-client'
-
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
 
 dotenv.config()
 
@@ -59,12 +54,8 @@ const command: Command = {
             value: serverInfo.players.list.map(name => `• ${name}`).join('\n'),
           },
         ])
-        .setThumbnail(`attachment://icon.jpg`)
         .setFooter({ text: 'Use "/minecraft add" to add your username!' })
-      await interaction.reply({
-        embeds: [embed],
-        files: [{ attachment: path.join(__dirname, '..', '..', 'data', 'lmucs_white.jpg'), name: 'icon.jpg' }],
-      })
+      await interaction.reply({ embeds: [embed] })
     } else if (subcommand === 'add') {
       const username = options.getString('username')
       if (!username) {
