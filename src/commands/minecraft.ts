@@ -6,7 +6,8 @@ import {
 } from 'discord.js'
 import Command from '../types/command'
 import dotenv from 'dotenv'
-import { Rcon } from 'rcon-client'
+import { addPlayer, getServerStatus } from '../util/minecraft'
+import { runQuery } from '../util/db'
 
 dotenv.config()
 
@@ -20,38 +21,46 @@ const command: Command = {
     .addSubcommand(
       new SlashCommandSubcommandBuilder()
         .setName('add')
-        .setDescription('Add a Minecraft username to the server whitelist')
-        .addStringOption(option => option.setName('username').setDescription('The username to add').setRequired(true))
+        .setDescription('Add a Minecraft username to the server. Please do not add other people!')
+        .addStringOption(option =>
+          option.setName('username').setDescription('The minecraft username to add').setRequired(true)
+        )
     ),
   execute: async interaction => {
     const options = interaction.options as CommandInteractionOptionResolver
     const subcommand = options.getSubcommand(false)
+
     if (subcommand === 'server') {
-      const ip = process.env.MINECRAFT_SERVER_IP
-      if (!ip) {
-        console.error('MINECRAFT_SERVER_IP is not defined in .env')
+      const hostname = process.env.MINECRAFT_SERVER_HOSTNAME
+      const serverInfo = await getServerStatus()
+      if (!serverInfo) {
         await interaction.reply('Server is offline')
         return
       }
-      const serverInfo = (await fetch('https://api.mcsrvstat.us/2/51.81.204.28').then(res => res.json())) as {
-        online: boolean
-        ip: string
-        version: string
-        icon: string
-        players: { online: number; max: number; list: string[] }
-      }
-      if (!serverInfo.online) {
-        await interaction.reply('Server is offline')
-        return
-      }
+
+      // Get the discord user for each player online
+      const playerDetails = await Promise.all(
+        serverInfo.players?.list?.map(async minecraftUsername => {
+          const response = await runQuery<{
+            DiscordID: string
+          }>('SELECT * FROM players WHERE MinecraftUsername = ?', [minecraftUsername])
+          const discordId = response[0]?.DiscordID
+          if (discordId) {
+            const user = await interaction.client.users.fetch(discordId)
+            return `• ${user} (${minecraftUsername})`
+          }
+          return `• ${minecraftUsername}`
+        }) || []
+      )
+
       const embed = new EmbedBuilder()
         .setTitle('LMUCS Minecraft Server')
         .setColor('#5b8731')
-        .setDescription(`**Server IP:** mc.lmucs.io\n**Version:** Java ${serverInfo.version}`)
+        .setDescription(`**Server IP:** ${hostname}\n**Version:** Java ${serverInfo.version}`)
         .setFields([
           {
-            name: `Players Online (${serverInfo.players.online}/${serverInfo.players.max})`,
-            value: serverInfo.players.list.map(name => `• ${name}`).join('\n'),
+            name: `Players Online (${serverInfo.players?.online || 0}/${serverInfo.players?.max || 0})`,
+            value: playerDetails.join('\n') || 'No players online',
           },
         ])
         .setFooter({ text: 'Use "/minecraft add" to add your username!' })
@@ -63,33 +72,10 @@ const command: Command = {
         return
       }
 
-      if (!process.env.MINECRAFT_SERVER_IP) {
-        console.error('MINECRAFT_SERVER_IP is not defined in .env')
-        await interaction.reply('Failed to connect to server')
-        return
-      }
-      if (!process.env.RCON_PORT) {
-        console.error('RCON_PORT is not defined in .env')
-        await interaction.reply('Failed to connect to server')
-        return
-      }
-      if (!process.env.RCON_PASSWORD) {
-        console.error('RCON_PASSWORD is not defined in .env')
-        await interaction.reply('Failed to connect to server')
-        return
-      }
-
-      const rcon = new Rcon({
-        host: process.env.MINECRAFT_SERVER_IP,
-        port: Number(process.env.RCON_PORT),
-        password: process.env.RCON_PASSWORD,
-      })
-
-      await rcon.connect()
-      await rcon.send(`whitelist add ${username}`)
-      await rcon.end()
-
-      await interaction.reply(`Added \`${username}\` to the server whitelist!`)
+      const added = await addPlayer(interaction.user.id, username)
+      await interaction.reply(
+        added ? `\`${username}\` has been added to the server!` : `\`${username}\` is already added to the server!`
+      )
     } else {
       await interaction.reply('Unknown subcommand!')
     }
