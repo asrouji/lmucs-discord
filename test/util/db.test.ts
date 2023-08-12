@@ -1,5 +1,4 @@
 import { runQuery } from '../../src/util/db'
-import mysql from 'mysql'
 
 jest.mock('mysql', () => ({
   createConnection: jest.fn().mockReturnValue({
