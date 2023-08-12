@@ -28,6 +28,11 @@ test('catches any missing env variables', async () => {
 })
 
 test('sends the command and returns the response', async () => {
+  process.env = {
+    MINECRAFT_SERVER_IP: 'ip',
+    RCON_PORT: 'port',
+    RCON_PASSWORD: 'pass',
+  }
   const response = await sendRconCommand('whitelist add Username')
   expect(response).toBe(sendReturnValue)
 })
