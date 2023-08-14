@@ -1,4 +1,4 @@
-# Welcome! 👋
+# Welcome!  👋
 
 You've reached the (virtual) social hub of LMU Computer Science and ACM. Here you can:
 
@@ -10,6 +10,6 @@ You've reached the (virtual) social hub of LMU Computer Science and ACM. Here yo
 
 Looking for a more professional experience? Check out the [LMUCS Slack workspace](https://lmucs.slack.com).
 
-## Onboarding 🦁
+## Onboarding  🦁
 
 To join the server, please make a selection below:
