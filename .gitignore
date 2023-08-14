@@ -4,3 +4,4 @@ coverage
 package-lock.json
 yarn-error.log
 .env
+data/resources.md
