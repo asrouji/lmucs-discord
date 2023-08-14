@@ -17,7 +17,12 @@ const __dirname = path.dirname(__filename)
 dotenv.config()
 
 const client = new BotClient({
-  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildIntegrations,
+  ],
 })
 
 const commandsPath = path.join(__dirname, '..', 'commands')
