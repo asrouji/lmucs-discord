@@ -53,7 +53,9 @@ const handler: InteractionHandler<StringSelectMenuInteraction> = {
         return
       }
 
-      const modal = new ModalBuilder().setCustomId('onboarding-modal').setTitle(`Welcome ${interaction.user.username}!`)
+      const modal = new ModalBuilder()
+        .setCustomId(`onboarding-modal-${selection}`)
+        .setTitle(`Welcome ${interaction.user.username}!`)
 
       const fullNameInput = new TextInputBuilder()
         .setCustomId('onboarding-prompt-full-name')

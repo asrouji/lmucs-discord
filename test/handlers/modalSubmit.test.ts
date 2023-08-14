@@ -1,10 +1,29 @@
-import { GuildMember, ModalSubmitInteraction } from 'discord.js'
+import { GuildMember, GuildMemberRoleManager, ModalSubmitInteraction, RoleResolvable } from 'discord.js'
 import modalSubmitInteractionHandler from '../../src/handlers/modalSubmit'
-import { mock } from 'jest-mock-extended'
+import { MockProxy, mock } from 'jest-mock-extended'
 
 describe('onboarding modal submission', () => {
-  const interaction = mock<ModalSubmitInteraction>({
-    customId: 'onboarding-modal',
+  const roleManager: MockProxy<GuildMemberRoleManager> = mock<GuildMemberRoleManager>({
+    add: jest.fn().mockImplementation((role: RoleResolvable) => {
+      if (typeof role === 'string' && role === 'error') {
+        throw new Error('Role cannot be added')
+      }
+    }),
+    valueOf: jest.fn(),
+  })
+  const member: MockProxy<GuildMember> = mock<GuildMember>({
+    setNickname: jest.fn(),
+    roles: roleManager,
+    toString: jest.fn().mockReturnValue('John Doe'),
+    valueOf: jest.fn(),
+  })
+  const role: MockProxy<RoleResolvable> = mock<RoleResolvable>({
+    name: 'student',
+    toString: jest.fn().mockReturnValue('student'),
+    valueOf: jest.fn(),
+  })
+  const interaction: MockProxy<ModalSubmitInteraction> = mock<ModalSubmitInteraction>({
+    customId: 'onboarding-modal-student',
     fields: {
       getTextInputValue: jest.fn().mockImplementation((customId: string) => {
         const sampleFields: Record<string, string> = {
@@ -13,32 +32,29 @@ describe('onboarding modal submission', () => {
         return sampleFields[customId] || ''
       }),
     },
-    member: jest.fn().mockImplementation(() => {
-      // we define the mock member this way so it is recognized as an instanceof GuildMember
-      const member = Object.create(GuildMember.prototype)
-      member.setNickname = jest.fn()
-      return member
-    })(),
+    member: member,
     deferUpdate: jest.fn(),
     valueOf: jest.fn(),
-  })
-
-  beforeAll(() => {
-    console.error = jest.fn()
+    guild: {
+      roles: {
+        cache: {
+          find: jest.fn().mockReturnValue(role),
+        } as never,
+        valueOf: jest.fn(),
+      },
+      valueOf: jest.fn(),
+    },
   })
 
   beforeEach(() => {
+    console.error = jest.fn()
     jest.clearAllMocks()
   })
 
   test("sets the user's nickname to their full name", async () => {
     await modalSubmitInteractionHandler.handle(interaction)
     expect((interaction.member as GuildMember).setNickname).toHaveBeenCalledWith('John Doe')
-  })
-
-  test('responds to the interaction', async () => {
-    await modalSubmitInteractionHandler.handle(interaction)
-    expect(interaction.deferUpdate).toHaveBeenCalled()
+    expect(roleManager.add).toHaveBeenCalledWith(role)
   })
 
   test('logs an error if the nickname cannot be set', async () => {
@@ -50,8 +66,30 @@ describe('onboarding modal submission', () => {
     expect(interaction.deferUpdate).toHaveBeenCalled()
   })
 
-  test('fails if interaction.member is not a GuildMember', async () => {
+  test('fails if interaction.member is null', async () => {
+    const member = interaction.member
     interaction.member = null
+    await modalSubmitInteractionHandler.handle(interaction)
+    expect(console.error).toHaveBeenCalled()
+    expect(interaction.deferUpdate).toHaveBeenCalled()
+    interaction.member = member
+  })
+
+  test('logs an error if the role cannot be added', async () => {
+    if (!interaction.guild) {
+      throw new Error('interaction.guild is null')
+    }
+    interaction.guild.roles.cache.find = jest.fn().mockReturnValue('error')
+    await modalSubmitInteractionHandler.handle(interaction)
+    expect(console.error).toHaveBeenCalled()
+    expect(interaction.deferUpdate).toHaveBeenCalled()
+  })
+
+  test('logs an error if the role cannot be found', async () => {
+    if (!interaction.guild) {
+      throw new Error('interaction.guild is null')
+    }
+    interaction.guild.roles.cache.find = jest.fn().mockReturnValue(undefined)
     await modalSubmitInteractionHandler.handle(interaction)
     expect(console.error).toHaveBeenCalled()
     expect(interaction.deferUpdate).toHaveBeenCalled()

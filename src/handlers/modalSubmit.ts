@@ -1,4 +1,4 @@
-import { EmbedBuilder, GuildMember, ModalSubmitInteraction, TextChannel } from 'discord.js'
+import { EmbedBuilder, GuildMember, GuildMemberRoleManager, ModalSubmitInteraction, TextChannel } from 'discord.js'
 import InteractionHandler from '../types/handler'
 import dotenv from 'dotenv'
 
@@ -6,19 +6,36 @@ dotenv.config()
 
 const handler: InteractionHandler<ModalSubmitInteraction> = {
   handle: async interaction => {
-    if (interaction.customId === 'onboarding-modal') {
-      const fullName = interaction.fields.getTextInputValue('onboarding-prompt-full-name')
-      if (!(interaction.member instanceof GuildMember)) {
-        interaction.deferUpdate()
-        console.error(`Interaction member ${interaction.user.username} is not a GuildMember`)
+    if (interaction.customId.startsWith('onboarding-modal')) {
+      if (!interaction.member) {
+        console.error(`No member found for user ${interaction.member}`)
+        await interaction.deferUpdate()
         return
       }
+      const fullName = interaction.fields.getTextInputValue('onboarding-prompt-full-name')
       try {
-        await interaction.member.setNickname(fullName)
+        await (interaction.member as GuildMember).setNickname(fullName)
       } catch (error) {
         console.error(`Insufficient permissions to change nickname for ${interaction.user.username}`)
       } finally {
         await interaction.deferUpdate()
+      }
+      const selection = interaction.customId.split('-')[2] as 'student' | 'alum' | 'guest'
+      const roleMap = {
+        student: process.env.STUDENT_ROLE_ID,
+        alum: process.env.ALUM_ROLE_ID,
+        guest: process.env.GUEST_ROLE_ID,
+      }
+      const role = interaction.guild?.roles.cache.find(role => role.id === roleMap[selection])
+      if (!role) {
+        console.error(`Could not find role ${selection} for user ${interaction.member}`)
+        return
+      }
+
+      try {
+        await (interaction.member.roles as GuildMemberRoleManager).add(role)
+      } catch (error) {
+        console.error(`Insufficient permissions to add role ${selection} for ${interaction.member}`)
       }
     } else if (interaction.customId === 'github-feed') {
       const username = interaction.fields.getTextInputValue('github-username')
