@@ -2,8 +2,8 @@ import { runQuery } from '../../src/util/db'
 
 jest.mock('mysql', () => ({
   createConnection: jest.fn().mockReturnValue({
-    query: jest.fn().mockImplementation((query, values, callback) => {
-      if (query === 'error') throw new Error('error')
+    query: jest.fn().mockImplementation((query, values, callback: (err: unknown, results: unknown) => unknown) => {
+      if (query === 'error') callback('error', undefined)
       callback(undefined, `result${values ? ` ${values.join(' ')}` : ''}`)
     }),
   }),
@@ -20,7 +20,7 @@ describe('runQuery', () => {
   })
 
   test('throws an error if the query fails', async () => {
-    await expect(runQuery('error')).rejects.toThrow('error')
+    await expect(runQuery('error')).rejects.toEqual('error')
   })
 
   test('passes the values to the query', async () => {
