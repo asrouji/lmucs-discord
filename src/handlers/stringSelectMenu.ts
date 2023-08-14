@@ -1,6 +1,7 @@
 import InteractionHandler from '../types/handler'
 import {
   ActionRowBuilder,
+  EmbedBuilder,
   ModalBuilder,
   StringSelectMenuInteraction,
   TextInputBuilder,
@@ -18,7 +19,13 @@ const handler: InteractionHandler<StringSelectMenuInteraction> = {
       // faculty/staff role requires manual verification
       if (selection === 'faculty') {
         await interaction.reply({
-          content: `Hey there! This role requires manual verification. A request has been sent to server administrators. Sorry for the inconvenience!\n\nIf you selected this role in error, no worries! Just make a new selection above.`,
+          embeds: [
+            new EmbedBuilder()
+              .setColor('#ffffff')
+              .setDescription(
+                `Hey there! This role requires manual verification; a request has been sent to server administrators. Sorry for the inconvenience!\n\nIf you selected this role in error, no worries! Just make a new selection above.`
+              ),
+          ],
           ephemeral: true,
         })
         const moderatorChannelId = process.env.MOD_CHANNEL_ID
@@ -31,8 +38,17 @@ const handler: InteractionHandler<StringSelectMenuInteraction> = {
         /* istanbul ignore else */
         if (moderatorChannel?.isTextBased()) {
           await moderatorChannel.send({
-            content: `${interaction.user} requested the faculty/staff role. Please verify them and assign appropriate roles.`,
+            embeds: [
+              new EmbedBuilder()
+                .setColor('#ffffff')
+                .setTitle('New Faculty/Staff Role Request')
+                .setDescription(
+                  `User ${interaction.user} requested the faculty/staff role. Please verify them and assign appropriate roles.`
+                ),
+            ],
           })
+        } else {
+          console.error(`MOD_CHANNEL_ID ${moderatorChannelId} is not a valid text channel`)
         }
         return
       }
