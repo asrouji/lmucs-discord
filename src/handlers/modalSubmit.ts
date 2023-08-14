@@ -65,7 +65,7 @@ const handler: InteractionHandler<ModalSubmitInteraction> = {
               '• Set `Content type` to `application/json`\n• Leave the `Secret` field blank\n• Trigger the webhook on `Just the push event`',
           },
           {
-            name: '4. Click `Add webhook`',
+            name: '4. Click "Add webhook"',
             value: "After this, you're all set! You can dismiss this message.",
           }
         )
