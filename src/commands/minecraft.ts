@@ -1,6 +1,7 @@
 import {
   CommandInteractionOptionResolver,
   EmbedBuilder,
+  GuildMemberRoleManager,
   SlashCommandBuilder,
   SlashCommandSubcommandBuilder,
 } from 'discord.js'
@@ -16,7 +17,7 @@ const command: Command = {
     .setName('minecraft')
     .setDescription('Minecraft server commands')
     .addSubcommand(
-      new SlashCommandSubcommandBuilder().setName('server').setDescription('View info on the LMUCS Minecraft server')
+      new SlashCommandSubcommandBuilder().setName('info').setDescription('View info on the LMUCS Minecraft server')
     )
     .addSubcommand(
       new SlashCommandSubcommandBuilder()
@@ -30,12 +31,18 @@ const command: Command = {
     const options = interaction.options as CommandInteractionOptionResolver
     const subcommand = options.getSubcommand(false)
 
-    if (subcommand === 'server') {
+    if (subcommand === 'info') {
       const hostname = process.env.MINECRAFT_SERVER_HOSTNAME
+      if (!hostname) {
+        console.error('MINECRAFT_SERVER_HOSTNAME is not defined in .env')
+        return await interaction.reply('Server is offline')
+      }
+
+      await interaction.reply('Loading server info...')
+
       const serverInfo = await getServerStatus()
       if (!serverInfo) {
-        await interaction.reply('Server is offline')
-        return
+        return await interaction.editReply('Server is offline')
       }
 
       // Get the discord user for each player online
@@ -64,7 +71,8 @@ const command: Command = {
           },
         ])
         .setFooter({ text: 'Use "/minecraft add" to add your username!' })
-      await interaction.reply({ embeds: [embed] })
+
+      await interaction.editReply({ content: '', embeds: [embed] })
     } else if (subcommand === 'add') {
       const username = options.getString('username')
       if (!username) {
@@ -72,9 +80,19 @@ const command: Command = {
         return
       }
 
+      await interaction.reply(`Adding player \`${username}\` to server...`)
+
       const added = await addPlayer(interaction.user.id, username)
-      await interaction.reply(
-        added ? `\`${username}\` has been added to the server!` : `\`${username}\` is already added to the server!`
+
+      const minecraftRole = interaction.guild?.roles.cache.find(role => role.id === process.env.MINECRAFT_ROLE_ID)
+      if (minecraftRole) {
+        await (interaction.member?.roles as GuildMemberRoleManager).add(minecraftRole)
+      }
+
+      await interaction.editReply(
+        added
+          ? `\`${username}\` has been added to the server!`
+          : `\`${username}\` has already been added to the server!`
       )
     } else {
       await interaction.reply('Unknown subcommand!')
