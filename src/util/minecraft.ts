@@ -44,7 +44,5 @@ export const getServerStatus = async () => {
     version?: string
     players?: { online: number; max: number; list?: string[] }
   }
-  serverInfo.players = serverInfo.players || { online: 1, max: 50, list: [] }
-  serverInfo.players.list = serverInfo.players.list || ['Aphexx']
   return serverInfo
 }
