@@ -1,0 +1,13 @@
+Welcome {user} to the server!
+{user} just showed up!
+{user} is here.
+Everyone welcome {user}!
+{user} just landed.
+{user} joined the party.
+{user} just slid into the server.
+Glad you're here, {user}.
+Yay you made it, {user}!
+Welcome {user}!
+{user} hopped into the server.
+{user} just joined. Everyone, look busy!
+{user} is here, as the prophecy foretold.
