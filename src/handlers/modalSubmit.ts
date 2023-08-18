@@ -44,26 +44,28 @@ const handler: InteractionHandler<ModalSubmitInteraction> = {
         }
       }
 
-      // send welcome message to #general
-      const generalChannelId = process.env.GENERAL_CHANNEL_ID
-      const generalChannel = interaction.guild?.channels.cache.find(channel => channel.id === generalChannelId)
-      if (!generalChannelId) {
-        console.error(`No general channel ID found`)
-      } else if (!interaction.guild) {
-        console.error(`No guild found for interaction`)
-      } else if (!generalChannel || !generalChannel.isTextBased()) {
-        console.error(`Could not find general channel with ID ${generalChannelId}`)
-      } else {
-        const welcomeMessage = WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)]
-        const joinEmoji = interaction.guild.emojis.cache.find(emoji => emoji.id === process.env.JOIN_EMOJI_ID || '')
-        await generalChannel
-          .send({
-            content: `${joinEmoji ? `${joinEmoji}  ` : ''}${welcomeMessage.replaceAll(
-              '{user}',
-              interaction.user.toString()
-            )}`,
-          })
-          .catch(console.error)
+      // if the user is a student, send a welcome message to #general
+      if (selection === 'student') {
+        const generalChannelId = process.env.GENERAL_CHANNEL_ID
+        const generalChannel = interaction.guild?.channels.cache.find(channel => channel.id === generalChannelId)
+        if (!generalChannelId) {
+          console.error(`No general channel ID found`)
+        } else if (!interaction.guild) {
+          console.error(`No guild found for interaction`)
+        } else if (!generalChannel || !generalChannel.isTextBased()) {
+          console.error(`Could not find general channel with ID ${generalChannelId}`)
+        } else {
+          const welcomeMessage = WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)]
+          const joinEmoji = interaction.guild.emojis.cache.find(emoji => emoji.id === process.env.JOIN_EMOJI_ID || '')
+          await generalChannel
+            .send({
+              content: `${joinEmoji ? `${joinEmoji}  ` : ''}${welcomeMessage.replaceAll(
+                '{user}',
+                interaction.user.toString()
+              )}`,
+            })
+            .catch(console.error)
+        }
       }
     } else if (interaction.customId === 'github-feed') {
       const username = interaction.fields.getTextInputValue('github-username')
