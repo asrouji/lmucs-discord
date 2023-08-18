@@ -1,18 +1,23 @@
 import { EmbedBuilder, GuildMember, GuildMemberRoleManager, ModalSubmitInteraction, TextChannel } from 'discord.js'
 import InteractionHandler from '../types/handler'
 import dotenv from 'dotenv'
+import { WELCOME_MESSAGES } from '../util/constants'
 
 dotenv.config()
 
 const handler: InteractionHandler<ModalSubmitInteraction> = {
   handle: async interaction => {
     if (interaction.customId.startsWith('onboarding-modal')) {
+      // new member finished onboarding!
+
       if (!interaction.member) {
         console.error(`No member found for user ${interaction.member}`)
         await interaction.deferUpdate()
         return
       }
+
       const fullName = interaction.fields.getTextInputValue('onboarding-prompt-full-name')
+
       try {
         await (interaction.member as GuildMember).setNickname(fullName)
       } catch (error) {
@@ -20,6 +25,8 @@ const handler: InteractionHandler<ModalSubmitInteraction> = {
       } finally {
         await interaction.deferUpdate()
       }
+
+      // assign appropriate role to user
       const selection = interaction.customId.split('-')[2] as 'student' | 'alum' | 'guest'
       const roleMap = {
         student: process.env.STUDENT_ROLE_ID,
@@ -29,13 +36,34 @@ const handler: InteractionHandler<ModalSubmitInteraction> = {
       const role = interaction.guild?.roles.cache.find(role => role.id === roleMap[selection])
       if (!role) {
         console.error(`Could not find role ${selection} for user ${interaction.member}`)
-        return
+      } else {
+        try {
+          await (interaction.member.roles as GuildMemberRoleManager).add(role)
+        } catch (error) {
+          console.error(`Insufficient permissions to add role ${selection} for ${interaction.member}`)
+        }
       }
 
-      try {
-        await (interaction.member.roles as GuildMemberRoleManager).add(role)
-      } catch (error) {
-        console.error(`Insufficient permissions to add role ${selection} for ${interaction.member}`)
+      // send welcome message to #general
+      const generalChannelId = process.env.GENERAL_CHANNEL_ID
+      const generalChannel = interaction.guild?.channels.cache.find(channel => channel.id === generalChannelId)
+      if (!generalChannelId) {
+        console.error(`No general channel ID found`)
+      } else if (!interaction.guild) {
+        console.error(`No guild found for interaction`)
+      } else if (!generalChannel || !generalChannel.isTextBased()) {
+        console.error(`Could not find general channel with ID ${generalChannelId}`)
+      } else {
+        const welcomeMessage = WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)]
+        const joinEmoji = interaction.guild.emojis.cache.find(emoji => emoji.id === process.env.JOIN_EMOJI_ID || '')
+        await generalChannel
+          .send({
+            content: `${joinEmoji ? `${joinEmoji}  ` : ''}${welcomeMessage.replaceAll(
+              '{user}',
+              interaction.user.toString()
+            )}`,
+          })
+          .catch(console.error)
       }
     } else if (interaction.customId === 'github-feed') {
       const username = interaction.fields.getTextInputValue('github-username')
