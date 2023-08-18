@@ -1,4 +1,4 @@
-import { GuildMember, GuildMemberRoleManager, ModalSubmitInteraction, RoleResolvable } from 'discord.js'
+import { GuildMember, GuildMemberRoleManager, ModalSubmitInteraction, RoleResolvable, TextChannel } from 'discord.js'
 import modalSubmitInteractionHandler from '../../src/handlers/modalSubmit'
 import { MockProxy, mock } from 'jest-mock-extended'
 
@@ -69,7 +69,7 @@ describe('onboarding modal submission', () => {
     jest.clearAllMocks()
   })
 
-  test("sets the user's nickname to their full name", async () => {
+  test("sets the user's nickname and assigns the correct role", async () => {
     await modalSubmitInteractionHandler.handle(interaction)
     expect((interaction.member as GuildMember).setNickname).toHaveBeenCalledWith('John Doe')
     expect(roleManager.add).toHaveBeenCalledWith(role)
@@ -111,6 +111,28 @@ describe('onboarding modal submission', () => {
     await modalSubmitInteractionHandler.handle(interaction)
     expect(console.error).toHaveBeenCalled()
     expect(interaction.deferUpdate).toHaveBeenCalled()
+  })
+
+  test('sends a welcome message to #general if the user is a student', async () => {
+    if (!interaction.guild) {
+      throw new Error('interaction.guild is null')
+    }
+    await modalSubmitInteractionHandler.handle(interaction)
+    expect(interaction.guild.channels.cache.find).toHaveBeenCalled()
+    const generalChannel = interaction.guild.channels.cache.find(() => true)
+    expect((generalChannel as TextChannel).send).toHaveBeenCalled()
+  })
+
+  test('logs an error if the welcome message cannot be sent', async () => {
+    if (!interaction.guild) {
+      throw new Error('interaction.guild is null')
+    }
+    // Pretend the general channel is not found
+    const generalChannel = interaction.guild.channels.cache.find(() => true)
+    ;(interaction.guild.channels.cache.find as jest.Mock).mockReturnValue(undefined)
+    await modalSubmitInteractionHandler.handle(interaction)
+    expect(console.error).toHaveBeenCalled()
+    expect((generalChannel as TextChannel).send).not.toHaveBeenCalled()
   })
 })
 

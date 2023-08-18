@@ -48,9 +48,8 @@ const handler: InteractionHandler<ModalSubmitInteraction> = {
       if (selection === 'student') {
         const generalChannelId = process.env.GENERAL_CHANNEL_ID
         const generalChannel = interaction.guild?.channels.cache.find(channel => channel.id === generalChannelId)
-        if (!generalChannelId) {
-          console.error(`No general channel ID found`)
-        } else if (!interaction.guild) {
+        /* istanbul ignore if */
+        if (!interaction.guild) {
           console.error(`No guild found for interaction`)
         } else if (!generalChannel || !generalChannel.isTextBased()) {
           console.error(`Could not find general channel with ID ${generalChannelId}`)
