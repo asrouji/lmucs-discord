@@ -30,7 +30,7 @@ const handler: InteractionHandler<ModalSubmitInteraction> = {
       const selection = interaction.customId.split('-')[2] as 'student' | 'alum' | 'guest'
       const roleMap = {
         student: process.env.STUDENT_ROLE_ID,
-        alum: process.env.ALUM_ROLE_ID,
+        alum: process.env.ALUMNI_ROLE_ID,
         guest: process.env.GUEST_ROLE_ID,
       }
       const role = interaction.guild?.roles.cache.find(role => role.id === roleMap[selection])
