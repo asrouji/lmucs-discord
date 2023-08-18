@@ -11,6 +11,8 @@ Welcome to the LMU Computer Science & ACM Discord! This guide provides a brief o
 
 ## Channels  📝
 
+Below is a brief description of each of our channels. You can use the <id:browse> feature to enable and disable channels as you see fit. Please note the social channels are for current students only.
+
 ### Info Channels
 
 - 🧭  **Server Guide** is this channel! It provides a brief overview of the server and what you can do here.
@@ -24,3 +26,4 @@ Welcome to the LMU Computer Science & ACM Discord! This guide provides a brief o
 - 🌳  **Grow A Tree** is where you'll find the (virtual) Keck Tree. Stop by and water it so we can grow it to staggering heights!
 - 💎  **Minecraft** is where you'll find details and discussion about our Minecraft server, and how to join!
 - 🐱  **GitHub Feed** is a feed of commits to public student project repositories, a fun way to keep up with what everyone's working on (and enjoy some amusing commit messages). Check the channel pins to learn how to add your own project!
+- 🤖  **Bot Commands** is a place to use bot commands without cluttering up other channels. Type a forward slash (`/`) to see all available commands!
