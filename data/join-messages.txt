@@ -11,3 +11,10 @@ Welcome {user}!
 {user} hopped into the server.
 {user} just joined. Everyone, look busy!
 {user} is here, as the prophecy foretold.
+Welcome, {user}! We're so happy you're here.
+The wait is over, {user} has finally arrived!
+Gather round everyone - {user} is here!
+The one and only {user} is here! Thanks for joining!
+{user} has joined! _happy dance_
+{user} has arrived!
+Salutations, {user}!
