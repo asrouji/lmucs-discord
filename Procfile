@@ -1,0 +1,1 @@
+worker: ts-node ./src/scripts/start.ts
