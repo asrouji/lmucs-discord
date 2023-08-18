@@ -1,7 +1,7 @@
 {
   "name": "discordjs-typescript-template",
   "version": "1.0.0",
-  "main": "src/bot.ts",
+  "main": "src/scripts/start.ts",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -11,9 +11,9 @@
     "lint": "eslint src --ext .ts",
     "typecheck": "tsc --noEmit",
     "build": "yarn typecheck && yarn lint && yarn test",
-    "dev": "nodemon --exec ts-node src/scripts/start.ts",
-    "deploy-commands": "ts-node src/scripts/deployCommands.ts",
-    "delete-commands": "ts-node src/scripts/deleteCommands.ts"
+    "dev": "npx nodemon --exec ts-node src/scripts/start.ts",
+    "deploy-commands": "npx ts-node src/scripts/deployCommands.ts",
+    "delete-commands": "npx ts-node src/scripts/deleteCommands.ts"
   },
   "dependencies": {
     "@babel/cli": "^7.21.5",
