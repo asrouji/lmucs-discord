@@ -63,3 +63,26 @@ export const CLASS_DATA = {
     color: '#5476d0',
   },
 }
+
+export const WELCOME_MESSAGES = [
+  'Welcome {user} to the server!',
+  '{user} just showed up!',
+  '{user} is here.',
+  'Everyone welcome {user}!',
+  '{user} just landed.',
+  '{user} joined the party.',
+  '{user} just slid into the server.',
+  "Glad you're here, {user}.",
+  'Yay you made it, {user}!',
+  'Welcome {user}!',
+  '{user} hopped into the server.',
+  '{user} just joined. Everyone, look busy!',
+  '{user} is here, as the prophecy foretold.',
+  "Welcome, {user}! We're so happy you're here.",
+  'The wait is over, {user} has finally arrived!',
+  'Gather round everyone - {user} is here!',
+  'The one and only {user} is here! Thanks for joining!',
+  '{user} has joined! _happy dance_',
+  '{user} has arrived!',
+  'Salutations, {user}!',
+]
