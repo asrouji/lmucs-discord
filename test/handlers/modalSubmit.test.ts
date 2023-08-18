@@ -42,6 +42,24 @@ describe('onboarding modal submission', () => {
         } as never,
         valueOf: jest.fn(),
       },
+      channels: {
+        cache: {
+          find: jest.fn().mockReturnValue({
+            send: jest.fn().mockReturnValue(Promise.resolve()),
+            isTextBased: jest.fn().mockReturnValue(true),
+            valueOf: jest.fn(),
+          }),
+        } as never,
+        valueOf: jest.fn(),
+      },
+      emojis: {
+        cache: {
+          find: jest.fn().mockReturnValue({
+            toString: jest.fn().mockReturnValue('emoji'),
+          }),
+        } as never,
+        valueOf: jest.fn(),
+      },
       valueOf: jest.fn(),
     },
   })
