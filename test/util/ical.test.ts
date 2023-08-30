@@ -1,5 +1,5 @@
 import { CLASS_DATA, CALENDAR_URLS } from '../../src/util/constants'
-import { DateTime } from 'luxon'
+import { DateTime, Settings } from 'luxon'
 import { getTutoringSessions } from '../../src/util/ical'
 import path from 'path'
 
@@ -64,4 +64,28 @@ test('filters out sessions that are not in the specified time period', async () 
   // there should be 4 sessions for tutor A and 4 for tutor B in this time period
   expect(sessions.filter(s => s.name === 'Tutor A')).toHaveLength(2)
   expect(sessions.filter(s => s.name === 'Tutor B')).toHaveLength(3)
+})
+
+test('returns the correct time regardless of host time zone', async () => {
+  const zone = Settings.defaultZone
+
+  // set the host time zone to something other than America/Los_Angeles to make sure the returned times are still in LA time
+  Settings.defaultZone = 'UTC'
+
+  const sessions = await getTutoringSessions({
+    start: DateTime.fromObject({ year: 2023, month: 7, day: 17 }, { zone: 'America/Los_Angeles' }).startOf('day'),
+    end: DateTime.fromObject({ year: 2023, month: 7, day: 20 }, { zone: 'America/Los_Angeles' }).endOf('day'),
+  })
+
+  console.log(sessions.map(s => `${s.name} ${s.start.hour}:${s.start.minute} - ${s.end.hour}:${s.end.minute}`))
+
+  // tutor A's sessions should start at 10:00 AM and end at 11:30 AM
+  expect(sessions.filter(s => s.name === 'Tutor A')[0].start.toFormat('HH:mm')).toBe('10:00')
+  expect(sessions.filter(s => s.name === 'Tutor A')[0].end.toFormat('HH:mm')).toBe('11:30')
+
+  // tutor B's sessions should start at 5:00 PM and end at 6:30 PM
+  expect(sessions.filter(s => s.name === 'Tutor B')[0].start.toFormat('HH:mm')).toBe('17:00')
+  expect(sessions.filter(s => s.name === 'Tutor B')[0].end.toFormat('HH:mm')).toBe('18:30')
+
+  Settings.defaultZone = zone
 })

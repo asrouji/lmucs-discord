@@ -27,15 +27,15 @@ const getCalendarEvents = async (url: string, from: DateTime, to: DateTime) => {
   const events = icalExpander.between(from.toUTC().toJSDate(), to.toUTC().toJSDate())
   const mappedEvents = events.events.map(
     (e: { startDate: { toJSDate: () => Date }; endDate: { toJSDate: () => Date }; summary: string }) => ({
-      start: DateTime.fromJSDate(e.startDate.toJSDate()),
-      end: DateTime.fromJSDate(e.endDate.toJSDate()),
+      start: DateTime.fromJSDate(e.startDate.toJSDate(), { zone: 'America/Los_Angeles' }),
+      end: DateTime.fromJSDate(e.endDate.toJSDate(), { zone: 'America/Los_Angeles' }),
       summary: e.summary,
     })
   )
   const mappedOccurrences = events.occurrences.map(
     (o: { startDate: { toJSDate: () => Date }; endDate: { toJSDate: () => Date }; item: { summary: string } }) => ({
-      start: DateTime.fromJSDate(o.startDate.toJSDate()),
-      end: DateTime.fromJSDate(o.endDate.toJSDate()),
+      start: DateTime.fromJSDate(o.startDate.toJSDate(), { zone: 'America/Los_Angeles' }),
+      end: DateTime.fromJSDate(o.endDate.toJSDate(), { zone: 'America/Los_Angeles' }),
       summary: o.item.summary,
     })
   )
