@@ -65,3 +65,20 @@ test('filters out sessions that are not in the specified time period', async () 
   expect(sessions.filter(s => s.name === 'Tutor A')).toHaveLength(2)
   expect(sessions.filter(s => s.name === 'Tutor B')).toHaveLength(3)
 })
+
+test('returns the correct time of day for each session', async () => {
+  const sessions = await getTutoringSessions({
+    start: DateTime.fromObject({ year: 2023, month: 7, day: 17 }, { zone: 'America/New_York' }).startOf('day'),
+    end: DateTime.fromObject({ year: 2023, month: 7, day: 20 }, { zone: 'America/New_York' }).endOf('day'),
+  })
+
+  console.log(sessions.map(s => `${s.name} ${s.start.hour}:${s.start.minute} - ${s.end.hour}:${s.end.minute}`))
+
+  // tutor A's sessions should start at 10:00 AM and end at 11:30 AM
+  expect(sessions.filter(s => s.name === 'Tutor A')[0].start.toFormat('HH:mm')).toBe('10:00')
+  expect(sessions.filter(s => s.name === 'Tutor A')[0].end.toFormat('HH:mm')).toBe('11:30')
+
+  // tutor B's sessions should start at 5:00 PM and end at 6:30 PM
+  expect(sessions.filter(s => s.name === 'Tutor B')[0].start.toFormat('HH:mm')).toBe('17:00')
+  expect(sessions.filter(s => s.name === 'Tutor B')[0].end.toFormat('HH:mm')).toBe('18:30')
+})
